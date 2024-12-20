@@ -22,12 +22,26 @@ jobs:
     - name: Set Up Docker Buildx
       uses: docker/setup-buildx-action@v2
 
-    - name: Build Raspberry Pi OS Image
+    - name: Install Dependencies
       run: |
         sudo apt-get update
         sudo apt-get install -y coreutils quilt parted qemu-user-static debootstrap zerofree zip \
                                 dosfstools libarchive-tools libcap2-bin grep rsync xz-utils file git curl bc \
                                 gpg pigz xxd arch-test
+
+    - name: Create Config File
+      run: |
+        echo "IMG_NAME='digital-signage-os'" > config
+        echo "RELEASE='bookworm'" >> config
+        echo "ENABLE_SSH=1" >> config
+        echo "LOCALE_DEFAULT='en_US.UTF-8'" >> config
+        echo "TIMEZONE_DEFAULT='America/New_York'" >> config
+        echo "Created config file: "
+        cat config
+
+    - name: Run Raspberry Pi OS Build
+      run: |
+        chmod +x build-docker.sh
         ./build-docker.sh
 
     - name: Upload Artifact

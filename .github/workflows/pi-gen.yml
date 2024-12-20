@@ -22,12 +22,28 @@ jobs:
     - name: Set Up Docker Buildx
       uses: docker/setup-buildx-action@v2
 
+    - name: Cache APT Packages
+      uses: actions/cache@v3
+      with:
+        path: /var/cache/apt
+        key: ${{ runner.os }}-apt-cache
+        restore-keys: |
+          ${{ runner.os }}-apt-cache
+
     - name: Install Dependencies
       run: |
         sudo apt-get update
         sudo apt-get install -y coreutils quilt parted qemu-user-static debootstrap zerofree zip \
                                 dosfstools libarchive-tools libcap2-bin grep rsync xz-utils file git curl bc \
                                 gpg pigz xxd arch-test
+
+    - name: Cache Build Data
+      uses: actions/cache@v3
+      with:
+        path: work/
+        key: ${{ runner.os }}-pigen-work-${{ github.sha }}
+        restore-keys: |
+          ${{ runner.os }}-pigen-work
 
     - name: Create Config File
       run: |
